@@ -12,6 +12,7 @@ type AuthState = {
     loading: boolean
     error: string | null
     initialized: boolean
+    isUsingFallbackProfile: boolean
 }
 
 const initialState:AuthState = {
@@ -21,21 +22,24 @@ const initialState:AuthState = {
     role: null,
     loading: false, 
     error: null, 
-    initialized: false
+    initialized: false,
+    isUsingFallbackProfile: false
 }
 
 export const fetchSession = createAsyncThunk('auth/fetchSession', async() => {
     const {data, error} = await supabase.auth.getSession()
     if (error) throw error
     
+    // Crear perfil desde user_metadata (sin consultar DB)
     let profile = null
     if (data.session?.user) {
-        const { data: profileData } = await supabase
-            .from('profiles')
-            .select('*')
-            .eq('id', data.session.user.id)
-            .single()
-        profile = profileData
+        profile = {
+            id: data.session.user.id,
+            email: data.session.user.email || '',
+            role: data.session.user.user_metadata?.role || 'paciente',
+            created_at: data.session.user.created_at,
+            updated_at: data.session.user.updated_at || new Date().toISOString()
+        }
     }
     
     return { session: data.session, profile }
@@ -45,14 +49,16 @@ export const signIn = createAsyncThunk('auth/signIn',async({email,password}:{ema
     const {error, data} = await supabase.auth.signInWithPassword({email,password})
     if(error) throw error
     
+    // Crear perfil desde user_metadata (sin consultar DB)
     let profile = null
     if (data.session?.user) {
-        const { data: profileData } = await supabase
-            .from('profiles')
-            .select('*')
-            .eq('id', data.session.user.id)
-            .single()
-        profile = profileData
+        profile = {
+            id: data.session.user.id,
+            email: data.session.user.email || '',
+            role: data.session.user.user_metadata?.role || 'paciente',
+            created_at: data.session.user.created_at,
+            updated_at: data.session.user.updated_at || new Date().toISOString()
+        }
     }
     
     return { session: data.session, profile }
@@ -61,19 +67,29 @@ export const signIn = createAsyncThunk('auth/signIn',async({email,password}:{ema
 export const signUp = createAsyncThunk(
     'auth/signUp', 
     async({email, password, role = 'paciente'}:{email:string, password:string, role?: UserRole}) => {
-        const { data, error } = await supabase.auth.signUp({ email, password })
+        // OPCIÓN SIMPLIFICADA: Usar user_metadata en lugar de tabla profiles
+        const { data, error } = await supabase.auth.signUp({
+            email,
+            password,
+            options: {
+                data: {
+                    role: role, // Guardar rol directamente en el usuario
+                    created_at: new Date().toISOString()
+                }
+            }
+        })
         if(error) throw error
         
+        // Crear perfil "virtual" desde metadata
         let profile = null
         if (data.user) {
-            // Actualizar el rol del perfil que se creó automáticamente
-            const { data: profileData } = await supabase
-                .from('profiles')
-                .update({ role })
-                .eq('id', data.user.id)
-                .select()
-                .single()
-            profile = profileData
+            profile = {
+                id: data.user.id,
+                email: data.user.email || '',
+                role: data.user.user_metadata?.role || 'paciente',
+                created_at: data.user.created_at,
+                updated_at: data.user.updated_at || new Date().toISOString()
+            }
         }
         
         return { session: data.session, profile }
@@ -102,6 +118,7 @@ const authSlice = createSlice({
                 state.role = null
                 state.initialized = true
                 state.error = null
+                state.isUsingFallbackProfile = false
                 return
             }
             
@@ -110,13 +127,15 @@ const authSlice = createSlice({
             state.user = action.payload.session?.user ?? null
             state.profile = action.payload.profile ?? null
             state.role = action.payload.profile?.role ?? null
+            state.isUsingFallbackProfile = action.payload.isFallback ?? false
             state.initialized = true
             
             console.log('📦 Estado actualizado:', {
                 hasSession: !!state.session,
                 hasUser: !!state.user,
                 hasProfile: !!state.profile,
-                role: state.role
+                role: state.role,
+                isFallback: state.isUsingFallbackProfile
             })
         }
     },

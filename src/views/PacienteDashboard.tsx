@@ -11,32 +11,20 @@ export default function PacienteDashboard() {
 
     return (
         <section className="dashboard-view">
-            <h1>🏥 Panel de Paciente</h1>
+            <h1>Patient Panel</h1>
             {user && <p className="user-info">Bienvenido, {user.email}</p>}
             
             <div className="dashboard-content">
                 <div className="dashboard-card">
-                    <h2>Mis Citas</h2>
-                    <p>Consulta y gestiona tus citas médicas.</p>
-                    <button>Ver Citas</button>
+                    <h2>Request for a quote</h2>
+                    <p>Request a quote for a service.</p>
+                    <button>Request</button>
                 </div>
                 
                 <div className="dashboard-card">
-                    <h2>Historial Médico</h2>
+                    <h2></h2>
                     <p>Accede a tu historial médico completo.</p>
                     <button>Ver Historial</button>
-                </div>
-                
-                <div className="dashboard-card">
-                    <h2>Agendar Cita</h2>
-                    <p>Agenda una nueva cita con un especialista.</p>
-                    <button>Agendar</button>
-                </div>
-                
-                <div className="dashboard-card">
-                    <h2>Recetas</h2>
-                    <p>Consulta tus recetas médicas.</p>
-                    <button>Ver Recetas</button>
                 </div>
             </div>
             
