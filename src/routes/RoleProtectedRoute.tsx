@@ -34,17 +34,26 @@ function hasAccess(userRole: UserRole | null, allowedRoles: UserRole[]): boolean
 }
 
 export default function RoleProtectedRoute({ children, allowedRoles }: RoleProtectedRouteProps) {
-    const { session, role, initialized } = useAppSelector((state) => state.auth)
+    const { session, role, profile, initialized } = useAppSelector((state) => state.auth)
     const location = useLocation()
 
+    // Mientras se inicializa, mostrar loading
     if (!initialized) {
         return <div className="route-loading">Verificando sesión…</div>
     }
 
+    // Si no hay sesión, redirigir al login
     if (!session) {
         return <Navigate to="/login" replace state={{ from: location }} />
     }
 
+    // Si hay sesión pero aún no se ha cargado el perfil, mostrar loading
+    // Esto evita el flash de "No autorizado" mientras se obtiene el perfil
+    if (session && !profile) {
+        return <div className="route-loading">Cargando perfil de usuario…</div>
+    }
+
+    // Ya tenemos sesión y perfil, verificar permisos
     if (!hasAccess(role, allowedRoles)) {
         return (
             <div className="unauthorized-view">

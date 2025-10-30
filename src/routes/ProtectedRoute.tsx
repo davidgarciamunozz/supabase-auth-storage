@@ -7,7 +7,7 @@ type ProtectedRouteProps = {
 }
 
 export default function ProtectedRoute({ children }: ProtectedRouteProps) {
-    const { session, initialized } = useAppSelector((state) => state.auth)
+    const { session, profile, initialized } = useAppSelector((state) => state.auth)
     const location = useLocation()
 
     if (!initialized) {
@@ -16,6 +16,11 @@ export default function ProtectedRoute({ children }: ProtectedRouteProps) {
 
     if (!session) {
         return <Navigate to="/login" replace state={{ from: location }} />
+    }
+
+    // Si hay sesión pero aún no se ha cargado el perfil, mostrar loading
+    if (session && !profile) {
+        return <div className="route-loading">Cargando perfil de usuario…</div>
     }
 
     return children
