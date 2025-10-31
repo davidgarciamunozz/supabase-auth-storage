@@ -44,6 +44,7 @@ export default function Login() {
 
     return (
         <NavLayout>
+            <main className="flex justify-center items-center h-screen w-full">
             <section className="auth-view flex flex-col gap-4">
             <h1>Iniciar sesión</h1>
             <form onSubmit={handleSubmit} className="auth-form flex flex-col gap-4">
@@ -74,6 +75,7 @@ export default function Login() {
                 ¿No tienes cuenta? <Link to="/register">Crear cuenta</Link>
             </p>
         </section>
+            </main>
         </NavLayout>
     )
 }

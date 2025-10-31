@@ -1,37 +1,47 @@
-import { signOut } from '../store/auth/authSlice'
-import { useAppDispatch, useAppSelector } from '../store/hooks'
+import { useState } from 'react'
+import NavLayout from '../layout/NavLayout'
+import RequestQuote from '../components/RequestQuote'
+import MyQuotes from '../components/MyQuotes'
+
+type Tab = 'request' | 'quotes'
 
 export default function PacienteDashboard() {
-    const dispatch = useAppDispatch()
-    const { user, loading } = useAppSelector((state) => state.auth)
-
-    const handleSignOut = () => {
-        dispatch(signOut())
-    }
+    const [activeTab, setActiveTab] = useState<Tab>('request')
 
     return (
-        <section className="dashboard-view">
-            <h1>Patient Panel</h1>
-            {user && <p className="user-info">Bienvenido, {user.email}</p>}
-            
-            <div className="dashboard-content">
-                <div className="dashboard-card">
-                    <h2>Request for a quote</h2>
-                    <p>Request a quote for a service.</p>
-                    <button>Request</button>
-                </div>
-                
-                <div className="dashboard-card">
-                    <h2></h2>
-                    <p>Accede a tu historial médico completo.</p>
-                    <button>Ver Historial</button>
+        <NavLayout>
+            <div className="patient-dashboard">
+                <div className="dashboard-container">
+                    <div className="dashboard-hero">
+                        <h1>Patient Dashboard</h1>
+                        <p>Request quotes and manage your consultations</p>
+                    </div>
+
+                    {/* Tabs */}
+                    <div className="tabs-container">
+                        <button
+                            className={`tab ${activeTab === 'request' ? 'tab-active' : ''}`}
+                            onClick={() => setActiveTab('request')}
+                        >
+                            <span className="tab-icon">📝</span>
+                            <span>Request Quote</span>
+                        </button>
+                        <button
+                            className={`tab ${activeTab === 'quotes' ? 'tab-active' : ''}`}
+                            onClick={() => setActiveTab('quotes')}
+                        >
+                            <span className="tab-icon">💼</span>
+                            <span>My Quotes</span>
+                        </button>
+                    </div>
+
+                    {/* Content */}
+                    <div className="tab-content">
+                        {activeTab === 'request' && <RequestQuote />}
+                        {activeTab === 'quotes' && <MyQuotes />}
+                    </div>
                 </div>
             </div>
-            
-            <button onClick={handleSignOut} disabled={loading} className="logout-button">
-                {loading ? 'Cerrando sesión…' : 'Cerrar sesión'}
-            </button>
-        </section>
+        </NavLayout>
     )
 }
-

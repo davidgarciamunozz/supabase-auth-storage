@@ -16,40 +16,17 @@ export default function FallbackProfileBanner() {
   }
 
   return (
-    <div style={{
-      backgroundColor: '#fff3cd',
-      borderBottom: '2px solid #ffc107',
-      padding: '12px 20px',
-      textAlign: 'center',
-      position: 'sticky',
-      top: 0,
-      zIndex: 1000,
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      gap: '15px'
-    }}>
-      <span style={{ fontSize: '20px' }}>⚠️</span>
-      <div style={{ flex: 1, maxWidth: '800px' }}>
+    <div className="fallback-banner">
+      <span className="fallback-banner-icon">⚠️</span>
+      <div className="fallback-banner-content">
         <strong>Modo de Acceso Limitado</strong>
-        <p style={{ margin: '5px 0 0 0', fontSize: '14px' }}>
-          No se pudo cargar tu perfil completo. Estás usando un rol temporal de 'paciente'.
-          Recarga la página para intentar obtener tu perfil real.
+        <p>
+          Could not load your complete profile. You are using a temporary role of 'paciente'.
+          Reload the page to try to get your real profile.
         </p>
       </div>
-      <button
-        onClick={handleReload}
-        style={{
-          backgroundColor: '#ffc107',
-          border: 'none',
-          padding: '8px 16px',
-          borderRadius: '4px',
-          cursor: 'pointer',
-          fontWeight: 'bold',
-          fontSize: '14px'
-        }}
-      >
-        Recargar Página
+      <button onClick={handleReload} className="fallback-banner-button">
+        Reload Page
       </button>
     </div>
   )

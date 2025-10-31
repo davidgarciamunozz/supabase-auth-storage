@@ -60,6 +60,7 @@ export default function Register() {
 
     return (
        <NavLayout>
+        <main className="flex justify-center items-center h-screen w-full">
          <section className="auth-view flex flex-col gap-4">
             <h1>Crear cuenta</h1>
             <form onSubmit={handleSubmit} className="auth-form">
@@ -122,6 +123,7 @@ export default function Register() {
                 ¿Ya tienes cuenta? <Link to="/login">Inicia sesión</Link>
             </p>
         </section>
+        </main>
        </NavLayout>
     )
 }
